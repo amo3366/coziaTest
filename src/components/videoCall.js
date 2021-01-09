@@ -1,62 +1,15 @@
-import React, { Component } from 'react';
-import Spinner from 'react-spinner';
-import classNames from 'classnames';
-import AccCore from 'opentok-accelerator-core';
-import 'opentok-solutions-css';
-import config from '../config.json';
-import '../App.css';
-import CallIcon from '@material-ui/icons/Call';
-import { Rnd } from "react-rnd"
+import React, { Component } from "react";
+import Spinner from "react-spinner";
+import classNames from "classnames";
+import AccCore from "opentok-accelerator-core";
+// import {connect} from 'react'
+import "opentok-solutions-css";
+import config from "../config.json";
+import "../App.css";
+import CallIcon from "@material-ui/icons/Call";
+import { Rnd } from "react-rnd";
 
 let otCore;
-const otCoreOptions = {
-  credentials: {
-    apiKey: config.apiKey,
-    sessionId: config.sessionId,
-    token: config.token,
-  },
-  // A container can either be a query selector or an HTML Element
-  streamContainers(pubSub, type, data, stream) {
-    return {
-      publisher: {
-        camera: '#cameraPublisherContainer',
-        screen: '#screenPublisherContainer',
-      },
-      subscriber: {
-        camera: '#cameraSubscriberContainer',
-        screen: '#screenSubscriberContainer',
-      },
-    }[pubSub][type];
-  },
-  controlsContainer: '#controls',
-  packages: ['screenSharing', 'annotation'],
-  communication: {
-    callProperties: null, // Using default
-  },
-  screenSharing: {
-    extensionID: 'plocfffmbcclpdifaikiikgplfnepkpo',
-    annotation: true,
-    externalWindow: false,
-    dev: true,
-    screenProperties: {
-      insertMode: 'append',
-      width: '100%',
-      height: '100%',
-      showControls: false,
-      style: {
-        buttonDisplayMode: 'off',
-      },
-      videoSource: 'window',
-      fitMode: 'contain' // Using default
-    },
-  },
-  annotation: {
-    absoluteParent: {
-      publisher: '.App-video-container',
-      subscriber: '.App-video-container'
-    }
-  },
-};
 
 /**
  * Build classes for container elements based on state
@@ -71,25 +24,42 @@ const containerClasses = (state) => {
   const activeCameraSubscribersOdd = activeCameraSubscribers % 2;
   const screenshareActive = viewingSharedScreen || sharingScreen;
   return {
-    controlClass: classNames('App-control-container', { hidden: !active }),
-    localAudioClass: classNames('ots-video-control circle audio', { hidden: !active, muted: !localAudioEnabled }),
-    localVideoClass: classNames('ots-video-control circle video', { hidden: !active, muted: !localVideoEnabled }),
-    localCallClass: classNames('ots-video-control circle end-call', { hidden: !active }),
-    cameraPublisherClass: classNames('video-container', { hidden: !active, small: !!activeCameraSubscribers || screenshareActive, left: screenshareActive }),
-    screenPublisherClass: classNames('video-container', { hidden: !active || !sharingScreen }),
-    cameraSubscriberClass: classNames('video-container', { hidden: !active || !activeCameraSubscribers },
-      { 'active-gt2': activeCameraSubscribersGt2 && !screenshareActive },
-      { 'active-odd': activeCameraSubscribersOdd && !screenshareActive },
+    controlClass: classNames("App-control-container", { hidden: !active }),
+    localAudioClass: classNames("ots-video-control circle audio", {
+      hidden: !active,
+      muted: !localAudioEnabled,
+    }),
+    localVideoClass: classNames("ots-video-control circle video", {
+      hidden: !active,
+      muted: !localVideoEnabled,
+    }),
+    localCallClass: classNames("ots-video-control circle end-call", {
+      hidden: !active,
+    }),
+    cameraPublisherClass: classNames("video-container", {
+      hidden: !active,
+      small: !!activeCameraSubscribers || screenshareActive,
+      left: screenshareActive,
+    }),
+    screenPublisherClass: classNames("video-container", {
+      hidden: !active || !sharingScreen,
+    }),
+    cameraSubscriberClass: classNames(
+      "video-container",
+      { hidden: !active || !activeCameraSubscribers },
+      { "active-gt2": activeCameraSubscribersGt2 && !screenshareActive },
+      { "active-odd": activeCameraSubscribersOdd && !screenshareActive },
       { small: screenshareActive }
     ),
-    screenSubscriberClass: classNames('video-container', { hidden: !viewingSharedScreen || !active }),
+    screenSubscriberClass: classNames("video-container", {
+      hidden: !viewingSharedScreen || !active,
+    }),
   };
 };
 
-const connectingMask = () =>
-  <Spinner />
+const connectingMask = () => <Spinner />;
 
-const startCallMask = start =>
+const startCallMask = (start) => (
   <CallIcon
     color="action"
     onClick={start}
@@ -97,11 +67,13 @@ const startCallMask = start =>
       cursor: "pointer",
     }}
   />
+);
 
 class VideoCall extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      counter: this.props.counter,
       connected: false,
       active: false,
       publishers: null,
@@ -111,7 +83,55 @@ class VideoCall extends Component {
       localVideoEnabled: true,
       hover: false,
       height: 0,
-      width: 0
+      width: 0,
+      otCoreOptions: {
+        credentials: {
+          apiKey: config.apiKey,
+          sessionId: config.sessionId,
+          token: config.token,
+        },
+        // A container can either be a query selector or an HTML Element
+        streamContainers(pubSub, type, data, stream) {
+          return {
+            publisher: {
+              camera: "#cameraPublisherContainer",
+              screen: "#screenPublisherContainer",
+            },
+            subscriber: {
+              camera: "#cameraSubscriberContainer",
+              screen: "#screenSubscriberContainer",
+            },
+          }[pubSub][type];
+        },
+        controlsContainer: "#controls",
+        packages: ["screenSharing", "annotation"],
+        communication: {
+          callProperties: null, // Using default
+        },
+        screenSharing: {
+          extensionID: "plocfffmbcclpdifaikiikgplfnepkpo",
+          annotation: true,
+          externalWindow: false,
+          dev: true,
+          screenProperties: {
+            insertMode: "append",
+            width: "100%",
+            height: "100%",
+            showControls: false,
+            style: {
+              buttonDisplayMode: "off",
+            },
+            videoSource: "window",
+            fitMode: "contain", // Using default
+          },
+        },
+        annotation: {
+          absoluteParent: {
+            publisher: ".App-video-container",
+            subscriber: ".App-video-container",
+          },
+        },
+      },
     };
     this.startCall = this.startCall.bind(this);
     this.endCall = this.endCall.bind(this);
@@ -119,35 +139,64 @@ class VideoCall extends Component {
     this.toggleLocalVideo = this.toggleLocalVideo.bind(this);
   }
 
+  static getDerivedStateFromProps(props, current_state) {
+    console.log("getDerivedStateFromProps");
+    console.log(otCore);
+    console.log("Props : ", props);
+    console.log("State : ", current_state);
+    if (props.counter !== current_state.counter) {
+      console.log("getDerivedStateFromProps inside change");
+      return { counter: props.counter };
+    }
+    return null;
+  }
+
   componentDidMount() {
-    otCore = new AccCore(otCoreOptions);
-    otCore.connect().then(() => this.setState({ connected: true }));
+    console.log("inside component did mouont");
+    otCore = new AccCore(this.state.otCoreOptions);
+    otCore.connect().then(() => {
+      this.setState({ connected: true });
+      this.startCall();
+    });
     const events = [
-      'subscribeToCamera',
-      'unsubscribeFromCamera',
-      'subscribeToScreen',
-      'unsubscribeFromScreen',
-      'startScreenShare',
-      'endScreenShare',
+      "subscribeToCamera",
+      "unsubscribeFromCamera",
+      "subscribeToScreen",
+      "unsubscribeFromScreen",
+      "startScreenShare",
+      "endScreenShare",
     ];
 
-    events.forEach(event => otCore.on(event, ({ publishers, subscribers, meta }) => {
-      this.setState({ publishers, subscribers, meta });
-    }));
+    console.log(otCore);
+
+    events.forEach((event) =>
+      otCore.on(event, ({ publishers, subscribers, meta }) => {
+        this.setState({ publishers, subscribers, meta });
+      })
+    );
   }
 
   startCall() {
-    otCore.startCall()
+    otCore
+      .startCall()
       .then(({ publishers, subscribers, meta }) => {
-        this.setState({ publishers, subscribers, meta, active: true, height: 200, width: 300 });
-        alert(this.state.width
-          )
-      }).catch(error => console.log(error));
+        this.setState({
+          publishers,
+          subscribers,
+          meta,
+          active: true,
+          height: 200,
+          width: 300,
+        });
+      })
+      .catch((error) => console.log(error));
   }
 
   endCall() {
-    otCore.endCall();
-    this.setState({ active: false, height: 0, width: 0});
+    // otCore.endCall();
+    otCore.disconnect();
+    this.setState({ active: false, height: 0, width: 0 });
+    this.props.endShow();
   }
 
   toggleLocalAudio() {
@@ -161,12 +210,12 @@ class VideoCall extends Component {
   }
 
   hoverEventOut = () => {
-    this.setState({ hover: false })
-  }
+    this.setState({ hover: false });
+  };
 
   hoverEventIn = () => {
-    this.setState({ hover: true })
-  }
+    this.setState({ hover: true });
+  };
 
   render() {
     const { connected, active } = this.state;
@@ -184,44 +233,58 @@ class VideoCall extends Component {
     return (
       <div className="App">
         <div className="App-main">
-
           <div
             onMouseOver={this.hoverEventIn}
             onMouseLeave={this.hoverEventOut}
             className="App-video-container"
           >
-            <div>
-              {!connected && connectingMask()}
-              {connected && !active && startCallMask(this.startCall)}
-            </div>
+            {/* <div>{connected && !active && startCallMask(this.startCall)}</div> */}
             <Rnd
-                default={{
-                  x: 0,
-                  y: 0,
-                  width: active ? this.state.width : 0,
-                  height: active ? this.state.height : 0,
-                }}
-                minHeight = {active? "300px": "0px"}
-                minWidth = {active? "300px": "0px"}
-                maxHeight = {active? "600px": "0px"}
-                maxWidth = {active? "600px": "0px"}
-                style = {{ backgroundColor: "black" }}
+              default={{
+                x: 0,
+                y: 0,
+                width: active ? this.state.width : 0,
+                height: active ? this.state.height : 0,
+              }}
+              minHeight={active ? "300px" : "0px"}
+              minWidth={active ? "300px" : "0px"}
+              maxHeight={active ? "600px" : "0px"}
+              maxWidth={active ? "600px" : "0px"}
+              style={{ backgroundColor: "black" }}
             >
-              <div id="cameraPublisherContainer" className={cameraPublisherClass} />
-              <div id="screenPublisherContainer" className={screenPublisherClass} />
-              <div id="cameraSubscriberContainer" className={cameraSubscriberClass} />
-              <div id="screenSubscriberContainer" className={screenSubscriberClass} />
-              {this.state.hover ?
+              <div
+                id="cameraPublisherContainer"
+                className={cameraPublisherClass}
+              />
+              <div
+                id="screenPublisherContainer"
+                className={screenPublisherClass}
+              />
+              <div
+                id="cameraSubscriberContainer"
+                className={cameraSubscriberClass}
+              />
+              <div
+                id="screenSubscriberContainer"
+                className={screenSubscriberClass}
+              />
+              {this.state.hover ? (
                 <div id="controls" className={controlClass}>
-                  <div className={localAudioClass} onClick={this.toggleLocalAudio} />
-                  <div className={localVideoClass} onClick={this.toggleLocalVideo} />
+                  <div
+                    className={localAudioClass}
+                    onClick={this.toggleLocalAudio}
+                  />
+                  <div
+                    className={localVideoClass}
+                    onClick={this.toggleLocalVideo}
+                  />
                   <div className={localCallClass} onClick={this.endCall} />
                 </div>
-                : null}
+              ) : null}
             </Rnd>
           </div>
         </div>
-      </div >
+      </div>
     );
   }
 }
