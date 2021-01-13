@@ -12,6 +12,11 @@ body {
     box-sizing: inherit;
 }
 
+.App{
+    background-color: transparent;
+}
+
+
 .App-header {
     background-color: #222;
     height: 40px;
